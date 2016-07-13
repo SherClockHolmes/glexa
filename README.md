@@ -2,53 +2,53 @@ GLEXA
 =====
 
 Glexa is an Alexa Skills webservice written in Go. Integrate Glexa with your go web server to create/host your own
-Alexa commands (skills).
+Alexa commands (skills). Forked from [davinche/glexa](https://github.com/davinche/glexa).
 
 
-Usage Example
+Example Handler
 -------------
-VerifyRequest is the middleware that handles the authentication of Alexa requests.
 
 ```go
-func alexaHandler(w http.ResponseWriter, r *http.Request) {
-	glexa.VerifyRequest(handleAlexaCommands)(w, r)
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/sherclockholmes/glexa"
+)
+
+func AlexaHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := glexa.Decode(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp := &glexa.Response{}
+
+	switch body.Request.Type {
+	case glexa.LaunchRequest:
+		resp.Tell("I did not understand your command. Please try again.")
+	case glexa.IntentRequest:
+		resp.Tell("You are awesome!")
+	case glexa.SessionEndedRequest:
+		resp.Tell("Good Bye!")
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = glexa.Encode(w, nil, resp)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
 
-log.Fatal(http.ListenAndServeTLS(":443", "mycert.pem", "mykey.pem", alexaHandler))
-```
-
-Responding to an Alexa Request
-------------------------------
-
-```go
-
-var handleAlexaCommands http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-	body, err := glexa.ParseBody(r.Body)
-	if err != nil {
-		log.Printf("error: could not parse alexa request body: %q\n", err)
-		http.Error(w, "", http.StatusBadRequest)
-	}
-
-	response := glexa.NewResponse()
-	response.Response.ShouldEndSession = true
-
-	if b.Request.IsLaunch() {
-		response.Tell("I did not understand your command. Please try again.")
-	}
-
-	if b.Request.IsSessionEnded() {
-		response.Tell("Good bye")
-	}
-
-	// do something awesome with intent
-	if b.Request.IsIntent() {
-		response.Tell("You are awesome!")
-	}
-
-	// json encode response
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	encoder := json.NewEncoder(w)
-	encoder.Encode(response)
+func main() {
+	// Use the glexa verification decorator
+	http.HandleFunc("/test", glexa.Verify(AlexaHandler))
+    log.Fatal(http.ListenAndServeTLS(":443", "mycert.pem", "mykey.pem", AlexaHandler))
 }
 ```
