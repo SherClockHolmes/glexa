@@ -4,6 +4,10 @@ GLEXA
 Glexa is an Alexa Skills webservice written in Go. Integrate Glexa with your go web server to create/host your own
 Alexa commands (skills). Forked from [davinche/glexa](https://github.com/davinche/glexa).
 
+```
+go get github.com/SherClockHolmes/glexa
+```
+
 
 Example Handler
 -------------

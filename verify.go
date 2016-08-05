@@ -67,6 +67,7 @@ func verifyBodyTimestamp(body io.Reader) error {
 	if time.Now().Sub(requestTime) > time.Second*150 {
 		return fmt.Errorf("Timestamp is stale")
 	}
+
 	return nil
 }
 
@@ -105,6 +106,7 @@ func validateCertChain(chainURL string) (*x509.Certificate, error) {
 	if _, err := cert.Verify(opts); err != nil {
 		return nil, fmt.Errorf("Could not verify cert chain: %q\n", err)
 	}
+
 	return cert, nil
 }
 
