@@ -1,4 +1,11 @@
+// JSON interface for alexa Response schema
+// https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference
 package glexa
+
+const (
+	outputSpeechPlainText = "PlainText"
+	outputSpeechSSML      = "SSML"
+)
 
 type ResponseBody struct {
 	Version           string      `json:"version"`
@@ -30,44 +37,61 @@ type Reprompt struct {
 }
 
 type Response struct {
+	Error            error         `json:"-"`
 	OutputSpeech     *OutputSpeech `json:"outputSpeech"`
 	Card             *Card         `json:"card"`
 	Reprompt         *Reprompt     `json:"reprompt"`
 	ShouldEndSession bool          `json:"shouldEndSession"`
 }
 
-// Convenience method for reprompting the user
+func NewResponse() *Response {
+	return &Response{}
+}
+
+// Reprompt the user with text
 func (r *Response) Ask(text string) *Response {
 	r.Reprompt = &Reprompt{
 		OutputSpeech: &OutputSpeech{
-			Type: "PlainText",
-			Text, text,
+			Type: outputSpeechPlainText,
+			Text: text,
 		},
 	}
 
 	return r
 }
 
-// Convenience method for setting the card
+// Reprompt the user with SSML
+func (r *Response) AskSSML(ssml string) *Response {
+	r.Reprompt = &Reprompt{
+		OutputSpeech: &OutputSpeech{
+			Type: outputSpeechSSML,
+			SSML: ssml,
+		},
+	}
+
+	return r
+}
+
+// Set the card
 func (r *Response) SetCard(card *Card) *Response {
 	r.Card = card
 	return r
 }
 
-// Convenience method for setting the plain text output speech type
+// Set the plain text output speech
 func (r *Response) Tell(text string) *Response {
 	r.OutputSpeech = &OutputSpeech{
-		Type: "PlainText",
+		Type: outputSpeechPlainText,
 		Text: text,
 	}
 
 	return r
 }
 
-// Convenience method for setting the SSML output speech type
+// Set the SSML output speech
 func (r *Response) TellSSML(ssml string) *Response {
 	r.OutputSpeech = &OutputSpeech{
-		Type: "SSML",
+		Type: outputSpeechSSML,
 		SSML: ssml,
 	}
 

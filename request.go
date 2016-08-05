@@ -1,4 +1,4 @@
-// JSON interface for alexa Request schemai
+// JSON interface for alexa Request schema
 // https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference
 package glexa
 
@@ -23,6 +23,10 @@ type RequestBody struct {
 	Version string  `json:"version"`
 	Session Session `json:"session"`
 	Request Request `json:"request"`
+}
+
+func (r *RequestBody) GetType() string {
+	return r.Request.Type
 }
 
 type Request struct {

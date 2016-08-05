@@ -31,7 +31,7 @@ func AlexaHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp := &glexa.Response{}
 
-	switch body.Request.Type {
+	switch body.GetType() {
 	case glexa.LaunchRequest:
 		resp.Tell("I did not understand your command. Please try again.")
 	case glexa.IntentRequest:
